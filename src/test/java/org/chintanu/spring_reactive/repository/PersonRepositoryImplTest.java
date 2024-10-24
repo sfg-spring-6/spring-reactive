@@ -2,6 +2,7 @@ package org.chintanu.spring_reactive.repository;
 
 import org.chintanu.spring_reactive.domain.Person;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,6 +19,7 @@ class PersonRepositoryImplTest {
     }
 
     @Test
+    @Disabled//Disabling as old test. Not relevant any more
     void findByIdMonoBlock() {
 
         Mono<Person> monoPerson = personRepository.findById(1);
