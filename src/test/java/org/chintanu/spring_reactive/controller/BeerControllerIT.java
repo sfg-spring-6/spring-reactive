@@ -38,6 +38,15 @@ class BeerControllerIT {
     }
 
     @Test
+    void getBeerByIdNotFound() throws Exception {
+
+        webTestClient.get()
+                .uri(BeerController.PATH_WITH_ID, 9898)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
     void createBeer() throws Exception {
 
         BeerDto beerDto = BeerDto.builder().beerName("Magnum").beerStyle("Bud").price(new BigDecimal("5")).quantityOnHand(34).build();
@@ -57,6 +66,15 @@ class BeerControllerIT {
         webTestClient.delete()
                 .uri(BeerController.PATH_WITH_ID, 3)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isNoContent();
+    }
+
+    @Test
+    void deleteBeerByIdNotFound() throws Exception {
+
+        webTestClient.delete()
+                .uri(BeerController.PATH_WITH_ID, 9898)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 }

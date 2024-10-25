@@ -3,8 +3,10 @@ package org.chintanu.spring_reactive.controller;
 import org.chintanu.spring_reactive.model.BeerDto;
 import org.chintanu.spring_reactive.service.BeerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,7 +29,9 @@ public class BeerController {
 
     @GetMapping(PATH_WITH_ID)
     public Mono<BeerDto> getBeerById(@PathVariable("beerId") Integer beerId) {
-        return beerService.getBeerById(beerId);
+
+        return beerService.getBeerById(beerId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @PostMapping(PATH)
@@ -42,8 +46,10 @@ public class BeerController {
 
     @DeleteMapping(PATH_WITH_ID)
     public Mono<ResponseEntity<Void>> deleteBeerById(@PathVariable("beerId") Integer beerId) {
-        return beerService.deleteBeerById(beerId)
-                .thenReturn(ResponseEntity.noContent().build());
+        return beerService.getBeerById(beerId)
+                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                        .map(beerDto -> beerService.deleteBeerById(beerId))
+                        .thenReturn(ResponseEntity.noContent().build());
         //Here if we use the map() method in-place of thenReturn then it would always send 200 OK as the map
         //wouldn't run because the response from the service is a Mono<Void>, so the map method won't run for Void as it contains nothing
     }
